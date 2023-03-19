@@ -22,6 +22,7 @@ class logger:
         self.db.execute("CREATE TABLE IF NOT EXISTS Message(uuid PRIMARY KEY, timestamp, deleted, event_uuid, id, content, channel_id, author_id, attachments)")
         self.db.execute("CREATE TABLE IF NOT EXISTS Asset(uuid PRIMARY KEY, timestamp, deleted, event_uuid, id, key, url)")
         self.db.execute("CREATE TABLE IF NOT EXISTS Attachment(uuid PRIMARY KEY, timestamp, deleted, event_uuid, id, url, proxy_url, size, filename)")
+        self.db.execute("CREATE TABLE IF NOT EXISTS UserSettings(uuid PRIMARY KEY, timestamp, deleted, event_uuid, id, locale)")
 
         # Create tables for events if they don't exist already
         self.db.execute("CREATE TABLE IF NOT EXISTS EventMessage(uuid PRIMARY KEY, timestamp, message_id)")
@@ -35,7 +36,20 @@ class logger:
         self.db.execute("CREATE TABLE IF NOT EXISTS EventGuildChannelDelete(uuid PRIMARY KEY, timestamp, channel_id)")
         self.db.execute("CREATE TABLE IF NOT EXISTS EventGuildChannelCreate(uuid PRIMARY KEY, timestamp, channel_id)")
         self.db.execute("CREATE TABLE IF NOT EXISTS EventGuildChannelUpdate(uuid PRIMARY KEY, timestamp, channel_id)")
+        self.db.execute("CREATE TABLE IF NOT EXISTS EventPrivateChannelDelete(uuid PRIMARY KEY, timestamp, channel_id)")
+        self.db.execute("CREATE TABLE IF NOT EXISTS EventPrivateChannelCreate(uuid PRIMARY KEY, timestamp, channel_id)")
+        self.db.execute("CREATE TABLE IF NOT EXISTS EventPrivateChannelUpdate(uuid PRIMARY KEY, timestamp, channel_id)")
+        self.db.execute("CREATE TABLE IF NOT EXISTS EventGuildChannelPinsUpdate(uuid PRIMARY KEY, timestamp, channel_id, last_pin)")
+        self.db.execute("CREATE TABLE IF NOT EXISTS EventPrivateChannelPinsUpdate(uuid PRIMARY KEY, timestamp, channel_id, last_pin)")
         self.db.execute("CREATE TABLE IF NOT EXISTS EventTyping(uuid PRIMARY KEY, timestamp, user_id, channel_id, time)")
+        self.db.execute("CREATE TABLE IF NOT EXISTS EventGroupJoin(uuid PRIMARY KEY, timestamp, user_id, channel_id)")
+        self.db.execute("CREATE TABLE IF NOT EXISTS EventGroupRemove(uuid PRIMARY KEY, timestamp, user_id, channel_id)")
+        self.db.execute("CREATE TABLE IF NOT EXISTS EventGuildJoin(uuid PRIMARY KEY, timestamp, guild_id)")
+        self.db.execute("CREATE TABLE IF NOT EXISTS EventGuildRemove(uuid PRIMARY KEY, timestamp, guild_id)")
+        self.db.execute("CREATE TABLE IF NOT EXISTS EventGuildUpdate(uuid PRIMARY KEY, timestamp, guild_id)")
+        self.db.execute("CREATE TABLE IF NOT EXISTS EventPresenceUpdate(uuid PRIMARY KEY, timestamp, user_id)")
+        self.db.execute("CREATE TABLE IF NOT EXISTS EventSettingsUpdate(uuid PRIMARY KEY, timestamp)")
+        self.db.execute("CREATE TABLE IF NOT EXISTS EventGuildSettingsUpdate(uuid PRIMARY KEY, timestamp, guild_id)")
 
     # Save a snapshot of a Discord object to the database
     async def saveObjectSnapshot(self, object, eventUUID = None):
@@ -103,7 +117,12 @@ class logger:
                 object.name,
                 object.discriminator]
 
-        elif objectType == "User" or objectType == "ClientUser":
+        elif objectType == "User":
+            newRow += [
+                object.name,
+                object.discriminator]
+
+        elif objectType == "ClientUser":
             newRow += [
                 object.name,
                 object.discriminator]
@@ -129,13 +148,16 @@ class logger:
                 object.proxy_url,
                 object.size,
                 object.filename]
-            try:
-                await object.save(f"{self.mediaPath}/{object.id}", use_cached = True)
-            except:
-                print(newRow)
+            await object.save(f"{self.mediaPath}/{object.id}", use_cached = True)
+
+        elif objectType == "UserSettings":
+            newRow += [
+                str(object.locale)
+            ]
 
         else:
             print(f"{objectType} unknown")
+            return
 
         # Fetch latest existing snapshot of object with ID
         response = self.cursor.execute(f"SELECT * FROM {objectType} WHERE id = ? ORDER BY timestamp DESC LIMIT 1", [object.id]).fetchone()
@@ -150,7 +172,7 @@ class logger:
         self.cursor.execute(f"INSERT INTO {objectType} (uuid, timestamp, deleted, event_uuid, id) VALUES (?, ?, ?, ?, ?)", [str(uuid.uuid4()), time.time(), 1, eventUUID, objectID])
         self.db.commit()
 
-    async def logEvent(self, eventType, eventData):
+    async def logEvent(self, eventType, eventData = []):
         rowUUID = str(uuid.uuid4())
         newRow = [rowUUID, time.time()] + eventData
         parameters = ", ".join("?" * len(newRow))

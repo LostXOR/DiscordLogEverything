@@ -21,6 +21,7 @@ async def on_ready():
         await logger.saveObjectSnapshot(guild)
 
 # Events to be logged
+# This can probably be compacted, but that is a task for future me
 @bot.event
 async def on_message(message):
     eventUUID = await logger.logEvent("Message", [message.id])
@@ -77,50 +78,87 @@ async def on_guild_channel_update(before, channel):
     await logger.saveObjectSnapshot(channel, eventUUID)
 
 @bot.event
+async def on_private_channel_delete(channel):
+    eventUUID = await logger.logEvent("PrivateChannelDelete", [channel.id])
+    await logger.deleteObject(channel.id, type(channel).__name__, eventUUID)
+
+@bot.event
+async def on_private_channel_create(channel):
+    eventUUID = await logger.logEvent("PrivateChannelCreate", [channel.id])
+    await logger.saveObjectSnapshot(channel, eventUUID)
+
+@bot.event
+async def on_private_channel_update(before, channel):
+    eventUUID = await logger.logEvent("PrivateChannelUpdate", [channel.id])
+    await logger.saveObjectSnapshot(channel, eventUUID)
+
+@bot.event
+async def on_guild_channel_pins_update(channel, last_pin):
+    lastPin = time.mktime(last_pin.timetuple()) if last_pin else None
+    eventUUID = await logger.logEvent("GuildChannelPinsUpdate", [channel.id, lastPin])
+    await logger.saveObjectSnapshot(channel, eventUUID)
+
+@bot.event
+async def on_private_channel_pins_update(channel, last_pin):
+    lastPin = time.mktime(last_pin.timetuple()) if last_pin else None
+    eventUUID = await logger.logEvent("PrivateChannelPinsUpdate", [channel.id, lastPin])
+    await logger.saveObjectSnapshot(channel, eventUUID)
+
+@bot.event
 async def on_typing(channel, user, when):
     eventUUID = await logger.logEvent("Typing", [user.id, channel.id, time.mktime(when.timetuple())])
+
+@bot.event
+async def on_group_join(channel, user):
+    eventUUID = await logger.logEvent("GroupJoin", [user.id, channel.id])
+    await logger.saveObjectSnapshot(user, eventUUID)
+    await logger.saveObjectSnapshot(channel, eventUUID)
+
+@bot.event
+async def on_group_remove(channel, user):
+    eventUUID = await logger.logEvent("GroupRemove", [user.id, channel.id])
+    await logger.saveObjectSnapshot(user, eventUUID)
+    await logger.saveObjectSnapshot(channel, eventUUID)
+
+@bot.event
+async def on_guild_join(guild):
+    eventUUID = await logger.logEvent("GuildJoin", [guild.id])
+    await logger.saveObjectSnapshot(guild, eventUUID)
+
+@bot.event
+async def on_guild_remove(guild):
+    eventUUID = await logger.logEvent("GuildRemove", [guild.id])
+    await logger.saveObjectSnapshot(guild, eventUUID)
+
+@bot.event
+async def on_guild_update(before, guild):
+    eventUUID = await logger.logEvent("GuildUpdate", [guild.id])
+    await logger.saveObjectSnapshot(guild, eventUUID)
+
+@bot.event
+async def on_presence_update(before, member):
+    # member can sometimes be a Relationship instead of a Member for some reason, idk why but we need to correct for it
+    if type(member).__name__ == "Relationship":
+        member = member.user
+    eventUUID = await logger.logEvent("PresenceUpdate", [member.id])
+    await logger.saveObjectSnapshot(member, eventUUID)
+
+@bot.event
+async def on_settings_update(before, settings):
+    eventUUID = await logger.logEvent("SettingsUpdate")
+    # saveObjectSnapshot needs an ID, so make a dummy one
+    settings.id = None
+    await logger.saveObjectSnapshot(settings, eventUUID)
+
+@bot.event
+async def on_guild_settings_update(before, settings):
+    eventUUID = await logger.logEvent("GuildSettingsUpdate", [settings.guild.id])
+    await logger.saveObjectSnapshot(settings.guild, eventUUID)
 
 bot.run(token)
 
 """
-#@bot.event
-#async def on_guild_channel_delete(channel):
-
-#@bot.event
-#async def on_guild_channel_create(channel):
-
-#@bot.event
-#async def on_guild_channel_update(channel):
-
-@bot.event
-async def on_guild_channel_pins_update(channel, last_pin):
-
-@bot.event
-async def on_private_channel_delete(channel):
-
-@bot.event
-async def on_private_channel_create(channel):
-
-@bot.event
-async def on_private_channel_update(before, after):
-
-@bot.event
-async def on_private_channel_pins_update(channel, last_pin):
-
-@bot.event
-async def on_group_join(channel, user):
-
-@bot.event
-async def on_group_remove(channel, user):
-
-#@bot.event
-#async def on_typing(channel, user, when):
-
-@bot.event
-async def on_settings_update():
-
-@bot.event
-async def on_guild_settings_update():
+To be added
 
 @bot.event
 async def on_required_action_update():
@@ -204,15 +242,6 @@ async def on_guild_available():
 async def on_guild_unavailable():
 
 @bot.event
-async def on_guild_join():
-
-@bot.event
-async def on_guild_remove():
-
-@bot.event
-async def on_guild_update():
-
-@bot.event
 async def on_guild_emojis_update():
 
 @bot.event
@@ -267,34 +296,7 @@ async def on_member_ban():
 async def on_member_unban():
 
 @bot.event
-async def on_presence_update():
-
-@bot.event
 async def on_raw_member_list_update():
-
-#@bot.event
-#async def on_message():
-
-#@bot.event
-#async def on_raw_message_edit():
-
-#@bot.event
-#async def on_raw_message_delete():
-
-#@bot.event
-#async def on_raw_bulk_message_delete():
-
-#@bot.event
-#async def on_raw_reaction_add():
-
-#@bot.event
-#async def on_raw_reaction_remove():
-
-#@bot.event
-#async def on_raw_reaction_clear():
-
-#@bot.event
-#async def on_raw_reaction_clear_emoji():
 
 @bot.event
 async def on_guild_role_create():

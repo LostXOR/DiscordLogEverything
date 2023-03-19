@@ -1,6 +1,6 @@
 # DiscordLogEverything
 ## Info
-#### This project is in alpha. Most functionality is incomplete, and bugs and errors are to be expected. Please let me know if you encounter any errors.
+#### This project is in pre-alpha. Most functionality is incomplete, versions are not thoroughly tested, and bugs and errors are to be expected. Please let me know if you encounter any errors.
 DiscordLogEverything is a program to log Discord objects (such as messages, channels, and users) and events (such as reactions, messages being sent, and messages being deleted). My eventual goal is to log all data the user can access, but currently the amount of things being logged is very limited.
 
 This was created as an alternative to [MessageLoggerV2](https://github.com/1Lighty/BetterDiscordPlugins/tree/master/Plugins/MessageLoggerV2), which is no longer being maintained.
