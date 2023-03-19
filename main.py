@@ -29,7 +29,7 @@ async def on_message(message):
 @bot.event
 async def on_raw_message_edit(event):
     eventUUID = await logger.logEvent("MessageEdit", [event.message_id])
-    await logger.saveObjectSnapshot(fetchMessage(event.message_id, event.channel_id), eventUUID)
+    await logger.saveObjectSnapshot(await fetchMessage(event.message_id, event.channel_id), eventUUID)
 
 @bot.event
 async def on_raw_message_delete(event):
