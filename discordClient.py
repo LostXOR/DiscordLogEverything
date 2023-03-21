@@ -5,12 +5,14 @@ from logEvent import logEvent
 
 class discordClient(discord.Client):
 
+    # Helper function to make it easier to fetch a message from message and channel IDs
     async def fetchMessage(self, messageID, channelID):
         channel = await self.fetch_channel(channelID)
         return await channel.fetch_message(messageID)
 
     async def on_ready(self):
-        print("Connected.")
+        print("Connected to Discord.")
+        # Snapshot guilds (also snapshots channels and members by recursion)
         for guild in self.guilds:
             await saveObjectSnapshot(guild)
 
@@ -185,19 +187,85 @@ class discordClient(discord.Client):
 
     async def on_thread_member_join(self, threadMember):
         eventUUID = logEvent("ThreadMemberJoin", [threadMember.id, threadMember.thread_id])
-        await saveObjectSnapshot(threadMember)
+        await saveObjectSnapshot(threadMember, eventUUID)
 
     async def on_thread_member_remove(self, threadMember):
         eventUUID = logEvent("ThreadMemberRemove", [threadMember.id, threadMember.thread_id])
-        await saveObjectSnapshot(threadMember)
+        await saveObjectSnapshot(threadMember, eventUUID)
+
+    async def on_relationship_add(self, relationship):
+        eventUUID = logEvent("RelationshipAdd", [relationship.id, relationship.user.id])
+        await saveObjectSnapshot(relationship, eventUUID)
+
+    async def on_relationship_remove(self, relationship):
+        eventUUID = logEvent("RelationshipRemove", [relationship.id, relationship.user.id])
+        await saveObjectSnapshot(relationship, eventUUID)
+
+    async def on_relationship_update(self, before, relationship):
+        eventUUID = logEvent("RelationshipUpdate", [relationship.id, relationship.user.id])
+        await saveObjectSnapshot(relationship, eventUUID)
+
+    async def on_connections_update(self):
+        eventUUID = logEvent("ConnectionsUpdate")
+        # Not sure how to log this...
+
+    async def on_connection_update(self, before, connection):
+        eventUUID = logEvent("ConnectionUpdate", [connection.url, connection.show_activity, connection.revoked])
+
+    async def on_connection_create(self, connection):
+        eventUUID = logEvent("ConnectionCreate", [connection.url, connection.show_activity, connection.revoked])
+
+    async def on_connections_link_callback(self, provider, code, state):
+        eventUUID = logEvent("ConnectionsLinkCallback", [provider, code, state])
+
+    async def on_scheduled_event_create(self, event):
+        eventUUID = logEvent("ScheduledEventCreate", [event.id])
+        await saveObjectSnapshot(event, eventUUID)
+
+    async def on_scheduled_event_delete(self, event):
+        eventUUID = logEvent("ScheduledEventDelete", [event.id])
+        deleteObject(event.id, "ScheduledEvent", eventUUID)
+
+    async def on_scheduled_event_update(self, before, event):
+        eventUUID = logEvent("ScheduledEventUpdate", [event.id])
+        await saveObjectSnapshot(event, eventUUID)
+
+    async def on_scheduled_event_user_add(self, event, user):
+        eventUUID = logEvent("ScheduledEventUserAdd", [user.id, event.id])
+        await saveObjectSnapshot(event, eventUUID)
+
+    async def on_scheduled_event_user_remove(self, event, user):
+        eventUUID = logEvent("ScheduledEventUserRemove", [user.id, event.id])
+        await saveObjectSnapshot(event, eventUUID)
+
+    async def on_member_ban(self, guild, user):
+        eventUUID = logEvent("MemberBan", [user.id, guild.id])
+        await saveObjectSnapshot(user, eventUUID)
+
+    async def on_member_unban(self, guild, user):
+        eventUUID = logEvent("MemberUnban", [user.id, guild.id])
+        await saveObjectSnapshot(user, eventUUID)
+
+    # These are difficult or impossible to test
+    async def on_required_action_update(self, action):
+        eventUUID = logEvent("RequiredActionUpdate", [str(action)])
+
+    async def on_payment_sources_update(self):
+        eventUUID = logEvent("PaymentSourcesUpdate")
+
+    async def on_subscriptions_update(self):
+        eventUUID = logEvent("SubscriptionsUpdate")
+
+    async def on_payment_client_add(self, tokenHash, expires):
+        eventUUID = logEvent("PaymentClientAdd", [tokenHash, time.mktime(expires.timetuple())])
+
+    async def on_payment_update(self, payment):
+        eventUUID = logEvent("PaymentUpdate", [payment.id])
+        await saveObjectSnapshot(payment, eventUUID)
+    # End of difficult or impossible to test
 
 """
 To be added
-async def on_required_action_update():
-async def on_payment_sources_update():
-async def on_subscriptions_update():
-async def on_payment_client_add():
-async def on_payment_update():
 async def on_premium_guild_subscription_slot_create():
 async def on_premium_guild_subscription_slot_update():
 async def on_billing_popup_bridge_callback():
@@ -208,13 +276,6 @@ async def on_entitlement_update():
 async def on_entitlement_delete():
 async def on_gift_create():
 async def on_gift_update():
-async def on_connections_update():
-async def on_connections_create():
-async def on_connections_delete():
-async def on_connections_link_callback():
-async def on_relationship_add():
-async def on_relationship_remove():
-async def on_relationship_update():
 async def on_call_create():
 async def on_call_delete():
 async def on_call_update():
@@ -229,16 +290,10 @@ async def on_raw_integration_delete():
 async def on_interaction():
 async def on_interaction_finish():
 async def on_modal():
-async def on_member_ban():
-async def on_member_unban():
 async def on_raw_member_list_update():
-async def on_scheduled_event_create():
-async def on_scheduled_event_delete():
-async def on_scheduled_event_update():
-async def on_scheduled_event_user_add():
-async def on_scheduled_event_user_remove():
 async def on_stage_instance_create():
 async def on_stage_instance_delete():
 async def on_stage_instance_update():
 async def on_voice_state_update():
+Not much left, yay!
 """

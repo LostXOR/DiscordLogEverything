@@ -1,5 +1,7 @@
-import time, uuid, gb
+import time, uuid, globalVars
 
+# Save a snapshot of the object and all its properties to the database
+# Currently just has a few skeleton properties for each object, more to be filled in
 async def saveObjectSnapshot(object, eventUUID = None):
     objectType = type(object).__name__
     # Array representing row to be added to database with variables common to all objects
@@ -9,7 +11,7 @@ async def saveObjectSnapshot(object, eventUUID = None):
         newRow += [
             object.name,
             object.owner_id,
-            time.mktime(object.joined_at.timetuple()),
+            time.mktime(object.joined_at.timetuple()) if object.joined_at else None,
             time.mktime(object.created_at.timetuple()),
             object.description,
             object.member_count,
@@ -102,7 +104,7 @@ async def saveObjectSnapshot(object, eventUUID = None):
             object.name,
             object.guild_id,
             object.url]
-        await object.save(f"{gb.mediaPath}/{object.id}")
+        await object.save(f"{globalVars.mediaPath}/{object.id}")
 
     elif objectType == "Role":
         newRow += [
@@ -114,7 +116,7 @@ async def saveObjectSnapshot(object, eventUUID = None):
         newRow += [
             object.key,
             object.url]
-        await object.save(f"{gb.mediaPath}/{object.id}")
+        await object.save(f"{globalVars.mediaPath}/{object.id}")
 
     elif objectType == "Attachment":
         newRow += [
@@ -122,19 +124,36 @@ async def saveObjectSnapshot(object, eventUUID = None):
             object.proxy_url,
             object.size,
             object.filename]
-        await object.save(f"{gb.mediaPath}/{object.id}", use_cached = True)
+        await object.save(f"{globalVars.mediaPath}/{object.id}", use_cached = True)
 
     elif objectType == "UserSettings":
         newRow += [
             str(object.locale)]
+
+    elif objectType == "Relationship":
+        newRow += [
+            object.user.id,
+            object.nick]
+
+    elif objectType == "ScheduledEvent":
+        newRow += [
+            object.name,
+            object.description,
+            time.mktime(object.start_time.timetuple()),
+            time.mktime(object.end_time.timetuple())]
+
+    elif objectType == "Payment":
+        newRow += [
+            object.currency,
+            object.sku_price]
 
     else:
         print(f"{objectType} unknown")
         return
 
     # Fetch latest existing snapshot of object with ID
-    response = gb.cursor.execute(f"SELECT * FROM {objectType} WHERE id = ? ORDER BY timestamp DESC LIMIT 1", [object.id]).fetchone()
+    response = globalVars.cursor.execute(f"SELECT * FROM {objectType} WHERE id = ? ORDER BY timestamp DESC LIMIT 1", [object.id]).fetchone()
     # Save new snapshot if latest snapshot is different or does not exist
     if not response or list(response[5:]) != newRow[5:]:
         parameters = ", ".join("?" * len(newRow))
-        gb.cursor.execute(f"INSERT INTO {objectType} VALUES ({parameters})", newRow)
+        globalVars.cursor.execute(f"INSERT INTO {objectType} VALUES ({parameters})", newRow)

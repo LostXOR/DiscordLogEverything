@@ -1,4 +1,4 @@
-import discord, os, datetime, argparse, signal, gb
+import discord, os, datetime, argparse, signal, globalVars
 from createDatabase import createDatabase
 from discordClient import discordClient
 
@@ -10,9 +10,9 @@ parser.add_argument("-m", "--media-dir", help = "Media directory", default = "me
 args = parser.parse_args()
 
 # Set global variables
-gb.cursor = createDatabase(args.database_file)
-gb.mediaPath = args.media_dir
-os.makedirs(gb.mediaPath, exist_ok = True)
+globalVars.cursor = createDatabase(args.database_file)
+os.makedirs(args.media_dir, exist_ok = True)
+globalVars.mediaPath = args.media_dir
 
 # Start bot
 bot = discordClient()

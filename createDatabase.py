@@ -1,4 +1,4 @@
-import os, sqlite3, gb
+import os, sqlite3, globalVars
 
 def createDatabase(databasePath):
     # Open database file
@@ -26,6 +26,9 @@ def createDatabase(databasePath):
     cursor.execute("CREATE TABLE IF NOT EXISTS Role(uuid PRIMARY KEY, timestamp, deleted, event_uuid, id, name, position, guild_id)")
     cursor.execute("CREATE TABLE IF NOT EXISTS Thread(uuid PRIMARY KEY, timestamp, deleted, event_uuid, id, name, member_count, owner_id, parent_id)")
     cursor.execute("CREATE TABLE IF NOT EXISTS ThreadMember(uuid PRIMARY KEY, timestamp, deleted, event_uuid, id, thread_id, joined_at)")
+    cursor.execute("CREATE TABLE IF NOT EXISTS Relationship(uuid PRIMARY KEY, timestamp, deleted, event_uuid, id, user_id, nick)")
+    cursor.execute("CREATE TABLE IF NOT EXISTS ScheduledEvent(uuid PRIMARY KEY, timestamp, deleted, event_uuid, id, name, description, start_time, end_time)")
+    cursor.execute("CREATE TABLE IF NOT EXISTS Payment(uuid PRIMARY KEY, timestamp, deleted, event_uuid, id, currency, sku_price)")
 
     # Create tables for events if they don't exist already
     cursor.execute("CREATE TABLE IF NOT EXISTS EventMessage(uuid PRIMARY KEY, timestamp, message_id)")
@@ -70,5 +73,24 @@ def createDatabase(databasePath):
     cursor.execute("CREATE TABLE IF NOT EXISTS EventThreadDelete(uuid PRIMARY KEY, timestamp, thread_id)")
     cursor.execute("CREATE TABLE IF NOT EXISTS EventThreadMemberJoin(uuid PRIMARY KEY, timestamp, member_id, thread_id)")
     cursor.execute("CREATE TABLE IF NOT EXISTS EventThreadMemberRemove(uuid PRIMARY KEY, timestamp, member_id, thread_id)")
+    cursor.execute("CREATE TABLE IF NOT EXISTS EventRelationshipAdd(uuid PRIMARY KEY, timestamp, member_id, thread_id)")
+    cursor.execute("CREATE TABLE IF NOT EXISTS EventRelationshipRemove(uuid PRIMARY KEY, timestamp, relationship_id, user_id)")
+    cursor.execute("CREATE TABLE IF NOT EXISTS EventRelationshipUpdate(uuid PRIMARY KEY, timestamp, relationship_id, user_id)")
+    cursor.execute("CREATE TABLE IF NOT EXISTS EventConnectionsUpdate(uuid PRIMARY KEY, timestamp)")
+    cursor.execute("CREATE TABLE IF NOT EXISTS EventConnectionUpdate(uuid PRIMARY KEY, timestamp, url, show_activity, revoked)")
+    cursor.execute("CREATE TABLE IF NOT EXISTS EventConnectionCreate(uuid PRIMARY KEY, timestamp, url, show_activity, revoked)")
+    cursor.execute("CREATE TABLE IF NOT EXISTS EventConnectionsLinkCallback(uuid PRIMARY KEY, timestamp, provider, code, state)")
+    cursor.execute("CREATE TABLE IF NOT EXISTS EventScheduledEventCreate(uuid PRIMARY KEY, timestamp, event_id)")
+    cursor.execute("CREATE TABLE IF NOT EXISTS EventScheduledEventDelete(uuid PRIMARY KEY, timestamp, event_id)")
+    cursor.execute("CREATE TABLE IF NOT EXISTS EventScheduledEventUpdate(uuid PRIMARY KEY, timestamp, event_id)")
+    cursor.execute("CREATE TABLE IF NOT EXISTS EventScheduledEventUserAdd(uuid PRIMARY KEY, timestamp, user_id, event_id)")
+    cursor.execute("CREATE TABLE IF NOT EXISTS EventScheduledEventUserRemove(uuid PRIMARY KEY, timestamp, user_id, event_id)")
+    cursor.execute("CREATE TABLE IF NOT EXISTS EventMemberBan(uuid PRIMARY KEY, timestamp, user_id, guild_id)")
+    cursor.execute("CREATE TABLE IF NOT EXISTS EventMemberUnban(uuid PRIMARY KEY, timestamp, user_id, guild_id)")
+    cursor.execute("CREATE TABLE IF NOT EXISTS EventRequiredActionUpdate(uuid PRIMARY KEY, timestamp, action)")
+    cursor.execute("CREATE TABLE IF NOT EXISTS EventPaymentSourcesUpdate(uuid PRIMARY KEY, timestamp)")
+    cursor.execute("CREATE TABLE IF NOT EXISTS EventSubscriptionsUpdate(uuid PRIMARY KEY, timestamp)")
+    cursor.execute("CREATE TABLE IF NOT EXISTS EventPaymentClientAdd(uuid PRIMARY KEY, timestamp, purchase_token_hash, expires_at)")
+    cursor.execute("CREATE TABLE IF NOT EXISTS EventPaymentUpdate(uuid PRIMARY KEY, timestamp, payment_id)")
 
     return cursor
