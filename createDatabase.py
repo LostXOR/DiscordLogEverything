@@ -25,7 +25,7 @@ def createDatabase(databasePath):
     cursor.execute("CREATE TABLE IF NOT EXISTS Emoji(uuid PRIMARY KEY, timestamp, deleted, event_uuid, id, name, guild_id, url)")
     cursor.execute("CREATE TABLE IF NOT EXISTS Role(uuid PRIMARY KEY, timestamp, deleted, event_uuid, id, name, position, guild_id)")
     cursor.execute("CREATE TABLE IF NOT EXISTS Thread(uuid PRIMARY KEY, timestamp, deleted, event_uuid, id, name, member_count, owner_id, parent_id)")
-    cursor.execute("CREATE TABLE IF NOT EXISTS ThreadMember(uuid PRIMARY KEY, timestamp, deleted, event_uuid, id, name, thread_id, joined_at)")
+    cursor.execute("CREATE TABLE IF NOT EXISTS ThreadMember(uuid PRIMARY KEY, timestamp, deleted, event_uuid, id, thread_id, joined_at)")
 
     # Create tables for events if they don't exist already
     cursor.execute("CREATE TABLE IF NOT EXISTS EventMessage(uuid PRIMARY KEY, timestamp, message_id)")
