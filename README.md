@@ -1,5 +1,5 @@
 # DiscordLogEverything
-## Info
+[![Discord](https://img.shields.io/discord/1087868245618470955?color=5865f2&label=Discord&logo=Discord&logoColor=5865f2)](https://discord.gg/eJjgmt7C73)
 #### This project is in pre-alpha. Most functionality is incomplete, versions are not thoroughly tested, and bugs and errors are to be expected.
 DiscordLogEverything is a program to log Discord objects (such as messages, channels, and users) and events (such as reactions, messages being sent, and messages being deleted). My eventual goal is to log all data the user can access, but currently the amount of things being logged is very limited.
 
@@ -24,7 +24,7 @@ Due to changes to the database layout, new versions of DiscordLogEverything are 
 ## Planned Features (roughly in planned order of completion)
 - [ ] Log all events (68/90)
 - [ ] Log all properties of objects (10%)
-- [ ] Command line options (15% complete)
+- [ ] Command line options (15%)
 - [ ] Customize events and objects being logged
 - [ ] Event and object viewer
 - [ ] Save channel and thread message history
