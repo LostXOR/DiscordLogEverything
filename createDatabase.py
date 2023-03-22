@@ -29,6 +29,9 @@ def createDatabase(databasePath):
     cursor.execute("CREATE TABLE IF NOT EXISTS Relationship(uuid PRIMARY KEY, timestamp, deleted, event_uuid, id, user_id, nick)")
     cursor.execute("CREATE TABLE IF NOT EXISTS ScheduledEvent(uuid PRIMARY KEY, timestamp, deleted, event_uuid, id, name, description, start_time, end_time)")
     cursor.execute("CREATE TABLE IF NOT EXISTS Payment(uuid PRIMARY KEY, timestamp, deleted, event_uuid, id, currency, sku_price)")
+    cursor.execute("CREATE TABLE IF NOT EXISTS Invite(uuid PRIMARY KEY, timestamp, deleted, event_uuid, id, uses, guild_id)")
+    cursor.execute("CREATE TABLE IF NOT EXISTS DMChannel(uuid PRIMARY KEY, timestamp, deleted, event_uuid, id, recipient_id)")
+    cursor.execute("CREATE TABLE IF NOT EXISTS Gift(uuid PRIMARY KEY, timestamp, deleted, event_uuid, id, max_uses, redeemed)")
 
     # Create tables for events if they don't exist already
     cursor.execute("CREATE TABLE IF NOT EXISTS EventMessage(uuid PRIMARY KEY, timestamp, message_id)")
@@ -92,5 +95,12 @@ def createDatabase(databasePath):
     cursor.execute("CREATE TABLE IF NOT EXISTS EventSubscriptionsUpdate(uuid PRIMARY KEY, timestamp)")
     cursor.execute("CREATE TABLE IF NOT EXISTS EventPaymentClientAdd(uuid PRIMARY KEY, timestamp, purchase_token_hash, expires_at)")
     cursor.execute("CREATE TABLE IF NOT EXISTS EventPaymentUpdate(uuid PRIMARY KEY, timestamp, payment_id)")
+    cursor.execute("CREATE TABLE IF NOT EXISTS EventInviteCreate(uuid PRIMARY KEY, timestamp, invite_id)")
+    cursor.execute("CREATE TABLE IF NOT EXISTS EventInviteDelete(uuid PRIMARY KEY, timestamp, invite_id)")
+    cursor.execute("CREATE TABLE IF NOT EXISTS EventGiftCreate(uuid PRIMARY KEY, timestamp, gift_id)")
+    cursor.execute("CREATE TABLE IF NOT EXISTS EventGiftUpdate(uuid PRIMARY KEY, timestamp, gift_id)")
+    cursor.execute("CREATE TABLE IF NOT EXISTS EventCallCreate(uuid PRIMARY KEY, timestamp, call_id)")
+    cursor.execute("CREATE TABLE IF NOT EXISTS EventCallDelete(uuid PRIMARY KEY, timestamp, call_id)")
+    cursor.execute("CREATE TABLE IF NOT EXISTS EventCallUpdate(uuid PRIMARY KEY, timestamp, call_id)")
 
     return cursor

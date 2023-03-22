@@ -31,6 +31,10 @@ async def saveObjectSnapshot(object, eventUUID = None):
             object.topic,
             object.position]
 
+    elif objectType == "DMChannel":
+        newRow += [
+            object.recipient.id]
+
     elif objectType == "VoiceChannel":
         newRow += [
             object.name,
@@ -124,7 +128,11 @@ async def saveObjectSnapshot(object, eventUUID = None):
             object.proxy_url,
             object.size,
             object.filename]
-        await object.save(f"{globalVars.mediaPath}/{object.id}", use_cached = True)
+        # Sometimes this throws an error, not sure why
+        try:
+            await object.save(f"{globalVars.mediaPath}/{object.id}", use_cached = True)
+        except:
+            print("Error fetching " + object.url)
 
     elif objectType == "UserSettings":
         newRow += [
@@ -146,6 +154,16 @@ async def saveObjectSnapshot(object, eventUUID = None):
         newRow += [
             object.currency,
             object.sku_price]
+
+    elif objectType == "Invite":
+        newRow += [
+            object.uses,
+            object.guild.id]
+
+    elif objectType == "Gift":
+        newRow == [
+            object.max_uses,
+            object.redeemed]
 
     else:
         print(f"{objectType} unknown")

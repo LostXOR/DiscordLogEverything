@@ -264,6 +264,32 @@ class discordClient(discord.Client):
         await saveObjectSnapshot(payment, eventUUID)
     # End of difficult or impossible to test
 
+    async def on_invite_create(self, invite):
+        eventUUID = logEvent("InviteCreate", [invite.id])
+        await saveObjectSnapshot(invite, eventUUID)
+
+    async def on_invite_delete(self, invite):
+        eventUUID = logEvent("InviteDelete", [invite.id])
+        deleteObject(invite.id, "Invite", eventUUID)
+
+    async def on_gift_create(self, gift):
+        eventUUID = logEvent("GiftCreate", [gift.id])
+        await saveObjectSnapshot(gift, eventUUID)
+
+    async def on_gift_update(self, gift):
+        eventUUID = logEvent("GiftUpdate", [gift.id])
+        await saveObjectSnapshot(gift, eventUUID)
+
+    async def on_call_create(self, call):
+        eventUUID = logEvent("CallCreate", [call.channel.id])
+
+    async def on_call_delete(self, call):
+        eventUUID = logEvent("CallDelete", [call.channel.id])
+
+    async def on_call_update(self, before, call):
+        eventUUID = logEvent("CallUpdate", [call.channel.id])
+
+
 """
 To be added
 async def on_premium_guild_subscription_slot_create():
@@ -274,14 +300,7 @@ async def on_achievement_update():
 async def on_entitlement_create():
 async def on_entitlement_update():
 async def on_entitlement_delete():
-async def on_gift_create():
-async def on_gift_update():
-async def on_call_create():
-async def on_call_delete():
-async def on_call_update():
 async def on_guild_stickers_update():
-async def on_invite_create():
-async def on_invite_delete():
 async def on_integration_create():
 async def on_integration_update():
 async def on_guild_integrations_update():
