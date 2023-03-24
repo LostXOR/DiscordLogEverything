@@ -128,11 +128,11 @@ async def saveObjectSnapshot(object, eventUUID = None):
             object.proxy_url,
             object.size,
             object.filename]
-        # Sometimes this throws an error, not sure why
+        # Sometimes the cache server doesn't have the file, so download from the non-cache server
         try:
             await object.save(f"{globalVars.mediaPath}/{object.id}", use_cached = True)
         except:
-            print("Error fetching " + object.url)
+            await object.save(f"{globalVars.mediaPath}/{object.id}")
 
     elif objectType == "UserSettings":
         newRow += [
@@ -161,9 +161,33 @@ async def saveObjectSnapshot(object, eventUUID = None):
             object.guild.id]
 
     elif objectType == "Gift":
-        newRow == [
+        newRow += [
             object.max_uses,
             object.redeemed]
+
+    elif objectType == "Interaction":
+        newRow += [
+            object.message.id]
+
+    elif objectType == "StageInstance":
+        newRow += [
+            object.channel.id]
+
+    elif objectType == "Achievement":
+        newRow += [
+            object.name]
+
+    elif objectType == "Entitlement":
+        newRow += [
+            object.parent_id]
+
+    elif objectType == "Modal":
+        newRow += [
+            object.title]
+
+    elif objectType == "Integration":
+        newRow += [
+            object.name]
 
     else:
         print(f"{objectType} unknown")

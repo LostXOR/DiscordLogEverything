@@ -22,7 +22,7 @@ Logged objects and events are stored in an sqlite3 database at the path specifie
 
 Due to changes to the database layout, new versions of DiscordLogEverything are usually not compatible with databases from previous versions. You should create a new database after updating to avoid errors.
 ## Planned Features (roughly in planned order of completion)
-- [ ] Log all events (68/90)
+- [x] Log all events
 - [ ] Log all properties of objects (10%)
 - [ ] Command line options (15%)
 - [ ] Customize events and objects being logged

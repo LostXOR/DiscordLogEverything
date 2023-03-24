@@ -22,7 +22,7 @@ class discordClient(discord.Client):
     async def on_message(self, message):
         eventUUID = logEvent("Message", [message.id])
         await saveObjectSnapshot(message, eventUUID)
-
+    # TODO: Use event.data instead of fetching message
     async def on_raw_message_edit(self, event):
         eventUUID = logEvent("MessageEdit", [event.message_id])
         await saveObjectSnapshot(await self.fetchMessage(event.message_id, event.channel_id), eventUUID)
@@ -32,7 +32,7 @@ class discordClient(discord.Client):
         deleteObject(event.message_id, "Message", eventUUID)
 
     async def on_raw_bulk_message_delete(self, event):
-        eventUUID = logEvent("BulkMessageDelete", [",".join(map(str, event.message_ids))])
+        eventUUID = logEvent("BulkMessageDelete", event.message_ids + [None] * (100 - len(event.message_ids)))
         for id in event.message_ids: deleteObject(id, "Message", eventUUID)
 
     async def on_raw_reaction_add(self, event):
@@ -86,7 +86,7 @@ class discordClient(discord.Client):
         await saveObjectSnapshot(channel, eventUUID)
 
     async def on_typing(self, channel, user, when):
-        eventUUID = logEvent("Typing", [user.id, channel.id, time.mktime(when.timetuple())])
+        logEvent("Typing", [user.id, channel.id, time.mktime(when.timetuple())])
 
     async def on_group_join(self, channel, user):
         eventUUID = logEvent("GroupJoin", [user.id, channel.id])
@@ -109,7 +109,7 @@ class discordClient(discord.Client):
         await saveObjectSnapshot(guild, eventUUID)
 
     async def on_presence_update(self, before, member):
-        # member can sometimes be a Relationship instead of a Member for some reason, idk why but we need to correct for it
+        # member can sometimes be a Relationship instead of a Member for some reason, it's a bug but we need to correct for it
         if type(member).__name__ == "Relationship":
             member = member.user
         eventUUID = logEvent("PresenceUpdate", [member.id])
@@ -204,10 +204,9 @@ class discordClient(discord.Client):
     async def on_relationship_update(self, before, relationship):
         eventUUID = logEvent("RelationshipUpdate", [relationship.id, relationship.user.id])
         await saveObjectSnapshot(relationship, eventUUID)
-
+    # TODO: figure out how to log this
     async def on_connections_update(self):
         eventUUID = logEvent("ConnectionsUpdate")
-        # Not sure how to log this...
 
     async def on_connection_update(self, before, connection):
         eventUUID = logEvent("ConnectionUpdate", [connection.url, connection.show_activity, connection.revoked])
@@ -246,7 +245,6 @@ class discordClient(discord.Client):
         eventUUID = logEvent("MemberUnban", [user.id, guild.id])
         await saveObjectSnapshot(user, eventUUID)
 
-    # These are difficult or impossible to test
     async def on_required_action_update(self, action):
         eventUUID = logEvent("RequiredActionUpdate", [str(action)])
 
@@ -262,14 +260,13 @@ class discordClient(discord.Client):
     async def on_payment_update(self, payment):
         eventUUID = logEvent("PaymentUpdate", [payment.id])
         await saveObjectSnapshot(payment, eventUUID)
-    # End of difficult or impossible to test
 
     async def on_invite_create(self, invite):
-        eventUUID = logEvent("InviteCreate", [invite.id])
+        eventUUID = logEvent("InviteCreate", [invite.id, invite.guild.id])
         await saveObjectSnapshot(invite, eventUUID)
 
     async def on_invite_delete(self, invite):
-        eventUUID = logEvent("InviteDelete", [invite.id])
+        eventUUID = logEvent("InviteDelete", [invite.id, invite.guild.id])
         deleteObject(invite.id, "Invite", eventUUID)
 
     async def on_gift_create(self, gift):
@@ -289,30 +286,83 @@ class discordClient(discord.Client):
     async def on_call_update(self, before, call):
         eventUUID = logEvent("CallUpdate", [call.channel.id])
 
+    async def on_interaction(self, interaction):
+        eventUUID = logEvent("Interaction", [interaction.id])
+        saveObjectSnapshot(interaction, eventUUID)
 
-"""
-To be added
-async def on_premium_guild_subscription_slot_create():
-async def on_premium_guild_subscription_slot_update():
-async def on_billing_popup_bridge_callback():
-async def on_library_application_update():
-async def on_achievement_update():
-async def on_entitlement_create():
-async def on_entitlement_update():
-async def on_entitlement_delete():
-async def on_guild_stickers_update():
-async def on_integration_create():
-async def on_integration_update():
-async def on_guild_integrations_update():
-async def on_webhooks_update():
-async def on_raw_integration_delete():
-async def on_interaction():
-async def on_interaction_finish():
-async def on_modal():
-async def on_raw_member_list_update():
-async def on_stage_instance_create():
-async def on_stage_instance_delete():
-async def on_stage_instance_update():
-async def on_voice_state_update():
-Not much left, yay!
-"""
+    async def on_interaction_finish(self, interaction):
+        eventUUID = logEvent("InteractionFinish", [interaction.id])
+        saveObjectSnapshot(interaction, eventUUID)
+
+    async def on_stage_instance_create(self, stage):
+        eventUUID = logEvent("StageInstanceCreate", [stage.id])
+        await saveObjectSnapshot(stage, eventUUID)
+
+    async def on_stage_instance_delete(self, stage):
+        eventUUID = logEvent("StageInstanceDelete", [stage.id])
+        await deleteObject(stage.id, "StageInstance", eventUUID)
+
+    async def on_stage_instance_update(self, stage):
+        eventUUID = logEvent("StageInstanceUpdate", [stage.id])
+        await saveObjectSnapshot(stage, eventUUID)
+
+    async def on_premium_guild_subscription_slot_create(self, slot):
+        eventUUID = logEvent("PremiumGuildSubscriptionSlotCreate", [slot.id])
+        await saveObjectSnapshot(slot, eventUUID)
+
+    async def on_premium_guild_subscription_slot_update(self, slot):
+        eventUUID = logEvent("PremiumGuildSubscriptionSlotUpdate", [slot.id])
+        await saveObjectSnapshot(slot, eventUUID)
+
+    async def on_achievement_update(self, achievement, percent_complete):
+        eventUUID = logEvent("AchievementUpdate", [achievement.id, percent_complete])
+        await saveObjectSnapshot(achievement, eventUUID)
+
+    async def on_entitlement_create(self, entitlement):
+        eventUUID = logEvent("EntitlementCreate", [entitlement.id])
+        await saveObjectSnapshot(entitlement, eventUUID)
+
+    async def on_entitlement_update(self, entitlement):
+        eventUUID = logEvent("EntitlementUpdate", [entitlement.id])
+        await saveObjectSnapshot(entitlement, eventUUID)
+
+    async def on_entitlement_delete(self, entitlement):
+        eventUUID = logEvent("EntitlementDelete", [entitlement.id])
+        await deleteObjectSnapshot(entitlement.id, "Entitlement", eventUUID)
+
+    async def on_modal(self, modal):
+        eventUUID = logEvent("Modal", [modal.id])
+        await saveObjectSnapshot(modal, eventUUID)
+
+    async def on_integration_create(self, integration):
+        eventUUID = logEvent("IntegrationCreate", [integration.id])
+        await saveObjectSnapshot(integration, eventUUID)
+
+    async def on_integration_update(self, integration):
+        eventUUID = logEvent("IntegrationUpdate", [integration.id])
+        await saveObjectSnapshot(integration, eventUUID)
+
+    async def on_raw_integration_delete(self, event):
+        eventUUID = logEvent("IntegrationDelete", [event.integration_id])
+        await deleteObject(event.integration_id, "Integration", eventUUID)
+
+    async def on_guild_integrations_update(self, guild):
+        eventUUID = logEvent("GuildIntegrationsUpdate", [guild.id])
+        await saveObjectSnapshot(guild, eventUUID)
+
+    async def on_webhooks_update(self, channel):
+        eventUUID = logEvent("WebhooksUpdate", [channel.id])
+        await saveObjectSnapshot(channel, eventUUID)
+    # TODO: Save before state in event?
+    async def on_voice_state_update(self, member, before, voiceState):
+        eventUUID = logEvent("VoiceStateUpdate", [member.id])
+        await saveObjectSnapshot(member, eventUUID)
+
+    async def on_billing_popup_bridge_callback(self, paymentSourceType, path, query, state):
+        eventUUID = logEvent("BillingPopupBridgeCallback", [str(paymentSourceType), path, query, state])
+
+    async def on_guild_stickers_update(guild, before, stickers):
+        eventUUID = logEvent("GuildStickersUpdate", [guild.id])
+        await saveObjectSnapshot(guild, eventUUID)
+
+# on_library_application_update may be added in the future
