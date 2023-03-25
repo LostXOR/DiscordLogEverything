@@ -189,6 +189,10 @@ async def saveObjectSnapshot(object, eventUUID = None):
         newRow += [
             object.name]
 
+    elif objectType == "StreamIntegration":
+        newRow += [
+            object.name]
+
     else:
         print(f"{objectType} unknown")
         return
