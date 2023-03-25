@@ -38,6 +38,7 @@ def createDatabase(databasePath):
     cursor.execute("CREATE TABLE IF NOT EXISTS Entitlement(uuid PRIMARY KEY, timestamp, deleted, event_uuid, id, parent_id)")
     cursor.execute("CREATE TABLE IF NOT EXISTS Modal(uuid PRIMARY KEY, timestamp, deleted, event_uuid, id, title)")
     cursor.execute("CREATE TABLE IF NOT EXISTS Integration(uuid PRIMARY KEY, timestamp, deleted, event_uuid, id, name)")
+    cursor.execute("CREATE TABLE IF NOT EXISTS StreamIntegration(uuid PRIMARY KEY, timestamp, deleted, event_uuid, id, name)")
 
     # Create tables for events if they don't exist already
     cursor.execute("CREATE TABLE IF NOT EXISTS EventMessage(uuid PRIMARY KEY, timestamp, message_id)")

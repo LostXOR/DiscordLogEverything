@@ -189,6 +189,7 @@ async def saveObjectSnapshot(object, eventUUID = None):
         newRow += [
             object.name]
 
+    # Sometimes on_integration_update gives a StreamIntegration instead of an Integration, this is a bug
     elif objectType == "StreamIntegration":
         newRow += [
             object.name]
