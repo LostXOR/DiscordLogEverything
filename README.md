@@ -18,14 +18,13 @@ main.py --token <Discord token> --database-file <database path> --media-dir <med
 ```
 `--database-file` and `--media-dir` are optional and will default to `database.db` and `media` in the current directory respectively.
 
-Logged objects and events are stored in an sqlite3 database at the path specified with `--database-file`. Attachments are stored in the directory specified with `--media-dir`. There is currently no viewer for the logs. You can query them using your favorite sqlite3 program.
+Logged objects and socket data are stored in an sqlite3 database at the path specified with `--database-file`. Attachments are stored in the directory specified with `--media-dir`. There is currently no viewer for the logs. You can query them using your favorite sqlite3 program.
 
 Due to changes to the database layout, new versions of DiscordLogEverything are usually not compatible with databases from previous versions. You should create a new database after updating to avoid errors.
 ## Planned Features (roughly in planned order of completion)
-- [x] Log all events
-- [ ] Log all properties of objects (10%)
+- [ ] Handle every event
 - [ ] Command line options (15%)
-- [ ] Customize events and objects being logged
-- [ ] Event and object viewer
+- [ ] Customize what is logged
+- [ ] Viewer
 - [ ] Save channel and thread message history
 - [ ] Export data in other formats (JSON compatible with [DiscordChatExporter-frontend](https://github.com/slatinsky/DiscordChatExporter-frontend)?)

@@ -1,5 +1,4 @@
-import discord, os, datetime, argparse, signal, globalVars
-from createDatabase import createDatabase
+import os, sqlite3, argparse, globalVars
 from discordClient import discordClient
 
 # Parse CLI arguments
@@ -9,11 +8,14 @@ parser.add_argument("-d", "--database-file", help = "Database file", default = "
 parser.add_argument("-m", "--media-dir", help = "Media directory", default = "media/")
 args = parser.parse_args()
 
-# Set global variables
-globalVars.cursor = createDatabase(args.database_file)
+# Create database
 os.makedirs(args.media_dir, exist_ok = True)
-globalVars.mediaPath = args.media_dir
+if os.path.dirname(args.database_file): os.makedirs(os.path.dirname(args.database_file), exist_ok = True)
+globalVars.database = sqlite3.connect(args.database_file, isolation_level = None)
+globalVars.cursor = globalVars.database.cursor()
+globalVars.cursor.execute("CREATE TABLE IF NOT EXISTS socket_recv(uuid PRIMARY KEY, timestamp, op, s, t, json)")
+globalVars.database.commit()
 
 # Start bot
-bot = discordClient()
+bot = discordClient(enable_debug_events = True)
 bot.run(args.token)
