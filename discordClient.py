@@ -11,7 +11,7 @@ class discordClient(discord.Client):
         # Set timestamp immediately to get as accurate of a time as possible
         timestamp = time.time()
         data = json.loads(msg)
-        print(msg)
+        #print(msg) forgot to comment this out, probably a good idea to avoid spamming people's consoles
 
         # Save raw socket data to the socket_recv table in the database
         recvUUID = str(uuid.uuid4())
