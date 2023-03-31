@@ -275,14 +275,14 @@ switch () {
             lastPinTimestamp: t.last_pin_timestamp
         });
         break;
-    case "CHANNEL_CREATE":
-    case "CHANNEL_DELETE":
+    case "CHANNEL_CREATE": // Done
+    case "CHANNEL_DELETE": // Done
         Vt({
             type: e,
             channel: (0, Le.q_)(t)
         });
         break;
-    case "CHANNEL_UPDATE":
+    case "CHANNEL_UPDATE": // Done
         Ft.add(t);
         break;
     case "THREAD_CREATE":

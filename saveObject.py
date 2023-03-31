@@ -10,6 +10,8 @@ def saveObject(objectJSON, objectType, parentUUID, timestamp, deleted):
     # Iterate through each key in the JSON
     for key in objectKeys:
         value = objectJSON[key]
+        # Look up type in name map
+        mappedName = nameMap[objectType][key] if objectType in nameMap and key in nameMap[objectType] else key
 
         # If value is a type that can be added to the database, add it to the database
         if isinstance(value, (str, int, float, bool, type(None))):
@@ -22,14 +24,14 @@ def saveObject(objectJSON, objectType, parentUUID, timestamp, deleted):
 
         # If value is a dict, save it with this function and add the UUID to the database
         elif isinstance(value, dict):
-            childUUID = saveObject(value, nameMap[key] if key in nameMap else key, selfUUID, timestamp, deleted)
+            childUUID = saveObject(value, mappedName, selfUUID, timestamp, deleted)
             objectValues.append(childUUID)
 
         # If value is an array of dicts, save each element with this function and add a comma-separated list of UUIDs to the database
         elif isinstance(value, list) and (len(value) == 0 or isinstance(value[0], dict)):
             childUUIDs = []
             for element in value:
-                childUUIDs.append(saveObject(element, nameMap[key] if key in nameMap else key, selfUUID, timestamp, deleted))
+                childUUIDs.append(saveObject(element, mappedName, selfUUID, timestamp, deleted))
             objectValues.append(",".join(childUUIDs) if childUUIDs else None)
 
         # PANIC!!!!
@@ -48,7 +50,7 @@ def saveObject(objectJSON, objectType, parentUUID, timestamp, deleted):
     # Write data to database
     # keyString could be subject to SQL injection but all values are provided by Discord so almost certainly not
     # Unfortunately column names cannot be parameterized so this is unavoidable
-    keyString = ", ".join(["uuid", "timestamp", "parent_uuid", "deleted"] + objectKeys)
+    keyString = ", ".join(["uuid", "parent_uuid", "timestamp", "deleted"] + objectKeys)
     parameterString = ", ".join(["?"] * (len(objectValues) + 4))
     globalVars.cursor.execute(f"INSERT INTO {objectType} ({keyString}) VALUES ({parameterString})", [selfUUID, parentUUID, timestamp, deleted] + objectValues)
     globalVars.database.commit()

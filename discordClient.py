@@ -11,7 +11,7 @@ class discordClient(discord.Client):
         # Set timestamp immediately to get as accurate of a time as possible
         timestamp = time.time()
         data = json.loads(msg)
-        #print(msg) forgot to comment this out, probably a good idea to avoid spamming people's consoles
+        #print(msg)
 
         # Save raw socket data to the socket_recv table in the database
         recvUUID = str(uuid.uuid4())
@@ -28,8 +28,9 @@ class discordClient(discord.Client):
             elif data["t"] == "READY_SUPPLEMENTAL":
                 pass
 
-            # Message events
-            elif data["t"] == "TYPING_START": pass  # Typing only provides a user ID and channel ID, so no objects to log
+            elif data["t"] == "TYPING_START": pass # Typing only provides a user ID and channel ID, so no objects to log
             elif data["t"] == "MESSAGE_CREATE" or data["t"] == "MESSAGE_UPDATE": saveObject(data["d"], "message", recvUUID, timestamp, False)
             elif data["t"] == "MESSAGE_DELETE": saveObject(data["d"], "message", recvUUID, timestamp, True)
-            elif data["t"] == "MESSAGE_DELETE_BULK": [saveObject({**data["d"], "id": id}, "message", recvUUID, timestamp, True) for id in data["d"].pop("ids")]
+            elif data["t"] == "MESSAGE_DELETE_BULK": [saveObject({**data["d"], "id": id}, "message", recvUUID, timestamp, True) for id in data["d"].pop("ids")] # Save each message ID as its own deleted message
+            elif data["t"] == "CHANNEL_CREATE" or data["t"] == "CHANNEL_UPDATE": saveObject(data["d"], "channel", recvUUID, timestamp, False)
+            elif data["t"] == "CHANNEL_DELETE": saveObject(data["d"], "channel", recvUUID, timestamp, True)
