@@ -1,4 +1,4 @@
-import os, sqlite3, argparse, globalVars
+import os, pymongo, argparse, sqlite3, globalVars
 from discordClient import discordClient
 
 # Parse CLI arguments
@@ -13,8 +13,8 @@ os.makedirs(args.media_dir, exist_ok = True)
 if os.path.dirname(args.database_file): os.makedirs(os.path.dirname(args.database_file), exist_ok = True)
 globalVars.database = sqlite3.connect(args.database_file, isolation_level = None)
 globalVars.cursor = globalVars.database.cursor()
-globalVars.cursor.execute("CREATE TABLE IF NOT EXISTS socket_recv(uuid PRIMARY KEY, timestamp, op, s, t, json)")
-globalVars.database.commit()
+globalVars.cursor.execute("CREATE TABLE IF NOT EXISTS socket_recv(uuid PRIMARY KEY, timestamp, json)")
+globalVars.cursor.execute("CREATE TABLE IF NOT EXISTS object(uuid PRIMARY KEY, socket_recv_uuid, timestamp, type, deleted, json)")
 
 # Start bot
 bot = discordClient(enable_debug_events = True)

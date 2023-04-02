@@ -96,7 +96,7 @@ switch () {
             })
         }), 2e3);
         break;
-    case "READY":
+    case "READY": // Done
         if (t.user.bot) {
             Vt({
                 type: "LOGOUT"
@@ -175,7 +175,7 @@ switch () {
             type: "CONNECTION_RESUMED"
         });
         break;
-    case "TYPING_START": // Done
+    case "TYPING_START":
         null != t.member && Rt(t.guild_id, t.member.user, t.member);
         Vt({
             type: "TYPING_START",
@@ -200,7 +200,7 @@ switch () {
             messageId: t.message_id
         });
         break;
-    case "MESSAGE_CREATE": // Done
+    case "MESSAGE_CREATE":
         Ct(t);
         null != t.author && Vt({
             type: "MESSAGE_CREATE",
@@ -211,7 +211,7 @@ switch () {
             isPushNotification: !1
         });
         break;
-    case "MESSAGE_UPDATE": // Done
+    case "MESSAGE_UPDATE":
         Ct(t);
         Vt({
             type: "MESSAGE_UPDATE",
@@ -219,7 +219,7 @@ switch () {
             message: t
         });
         break;
-    case "MESSAGE_DELETE": // Done
+    case "MESSAGE_DELETE":
         Vt({
             type: "MESSAGE_DELETE",
             guildId: t.guild_id,
@@ -227,7 +227,7 @@ switch () {
             channelId: t.channel_id
         });
         break;
-    case "MESSAGE_DELETE_BULK": // Done
+    case "MESSAGE_DELETE_BULK":
         Vt({
             type: "MESSAGE_DELETE_BULK",
             guildId: t.guild_id,
@@ -275,14 +275,14 @@ switch () {
             lastPinTimestamp: t.last_pin_timestamp
         });
         break;
-    case "CHANNEL_CREATE": // Done
-    case "CHANNEL_DELETE": // Done
+    case "CHANNEL_CREATE":
+    case "CHANNEL_DELETE":
         Vt({
             type: e,
             channel: (0, Le.q_)(t)
         });
         break;
-    case "CHANNEL_UPDATE": // Done
+    case "CHANNEL_UPDATE":
         Ft.add(t);
         break;
     case "THREAD_CREATE":

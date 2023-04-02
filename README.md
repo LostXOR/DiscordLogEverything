@@ -8,7 +8,7 @@ This was created as an alternative to [MessageLoggerV2](https://github.com/1Ligh
 Warning: DiscordLogEverything requires automating a user account, which is against Discord's Terms of Service. You are very unlikely to be banned while using it, but it is a possibility.
 
 ## Setup
-1. Install [discord-py.self](https://pypi.org/project/discord.py-self)
+1. Install [discord-py.self](https://pypi.org/project/discord.py-self) and [jsonpath-ng](https://pypi.org/project/jsonpath-ng).
 
 2. Clone this repository.
 ## Usage
@@ -18,12 +18,12 @@ main.py --token <Discord token> --database-file <database path> --media-dir <med
 ```
 `--database-file` and `--media-dir` are optional and will default to `database.db` and `media` in the current directory respectively.
 
-Logged objects and socket data are stored in an sqlite3 database at the path specified with `--database-file`. Attachments are stored in the directory specified with `--media-dir`. There is currently no viewer for the logs. You can query them using your favorite sqlite3 program.
+Logged objects and socket data are stored in an sqlite3 database at the path specified with `--database-file`. Attachments are ~~stored in the directory specified with `--media-dir`~~ not currently downloaded. There is currently no viewer for the logs. You can query them using your favorite sqlite3 program.
 
 Due to changes to the database layout, new versions of DiscordLogEverything are usually not compatible with databases from previous versions. You should create a new database after updating to avoid errors.
 ## Planned Features (roughly in planned order of completion)
-- [ ] Handle every event
-- [ ] Command line options (15%)
+- [ ] Parse every event
+- [ ] Command line options
 - [ ] Customize what is logged
 - [ ] Viewer
 - [ ] Save channel and thread message history
