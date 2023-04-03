@@ -173,6 +173,7 @@ def parseEvent(socketRecvUUID, timestamp, eventJSON):
         case "CREATOR_MONETIZATION_RESTRICTIONS_UPDATE": pass
         case "GUILD_AUDIT_LOG_ENTRY_CREATE": writeObject(d, "audit_log_entry", a, b)
         case "INTEGRATION_UPDATE": pass
+        case "INVITE_CREATE": pass
         case _:
             print(f"Event {eventJSON['t']} unknown.")
             print("Please create a bug report and include the below data. It will help to improve DiscordLogEverything.")
