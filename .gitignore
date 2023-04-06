@@ -1,0 +1,6 @@
+*
+!README.md
+!*.py
+!discord_gateway_events.js
+!.gitignore
+!.gitattributes
