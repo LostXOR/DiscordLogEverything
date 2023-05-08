@@ -22,9 +22,8 @@ Logged objects and socket data are stored in an sqlite3 database at the path spe
 
 Due to changes to the database layout, new versions of DiscordLogEverything are usually not compatible with databases from previous versions. You should create a new database after updating to avoid errors.
 ## Planned Features (roughly in planned order of completion)
-- [ ] Parse every event
-- [ ] Command line options
-- [ ] Customize what is logged
-- [ ] Viewer
+- [ ] Parse every event for assets/media and download them
+- [ ] More command line options
 - [ ] Save channel and thread message history
+- [ ] Viewer
 - [ ] Export data in other formats (JSON compatible with [DiscordChatExporter-frontend](https://github.com/slatinsky/DiscordChatExporter-frontend)?)
