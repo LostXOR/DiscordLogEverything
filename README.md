@@ -8,7 +8,7 @@ This was created as an alternative to [MessageLoggerV2](https://github.com/1Ligh
 Warning: DiscordLogEverything requires automating a user account, which is against Discord's Terms of Service. You are very unlikely to be banned while using it, but it is a possibility.
 
 ## Setup
-1. Install [discord-py.self](https://pypi.org/project/discord.py-self) and [jsonpath-ng](https://pypi.org/project/jsonpath-ng).
+1. Install [discord-py.self](https://pypi.org/project/discord.py-self).
 
 2. Clone this repository.
 ## Usage
