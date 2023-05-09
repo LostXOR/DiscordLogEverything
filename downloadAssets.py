@@ -30,11 +30,13 @@ def downloadAssets(socketRecvUUID, timestamp, eventJSON):
     # Big ol' switch case for each type of event
     match eventJSON["t"]:
         case "MESSAGE_CREATE":
-            for attachment in d["attachments"]:
-                downloadAsset(attachment["id"], attachment["url"], attachment["proxy_url"])
+            if "attachments" in d:
+                for attachment in d["attachments"]:
+                    downloadAsset(attachment["id"], attachment["url"], attachment["proxy_url"])
         case "MESSAGE_UPDATE":
-            for attachment in d["attachments"]:
-                downloadAsset(attachment["id"], attachment["url"], attachment["proxy_url"])
+            if "attachments" in d:
+                for attachment in d["attachments"]:
+                    downloadAsset(attachment["id"], attachment["url"], attachment["proxy_url"])
         case "READY": pass
         case "READY_SUPPLEMENTAL": pass
         case "MESSAGE_DELETE": pass
